@@ -43,11 +43,11 @@ setup(
                  "Operating System :: OS Independent",
                  "Programming Language :: Python",
                  "Programming Language :: Python :: 3 :: Only",
-                 "Topic :: Education"
+                 "Topic :: Scientific/Engineering :: Physics"
                  ],
 
     packages=find_packages(),
-    install_requires=["bs4", "numpy", "pandas"],
+    install_requires=["bs4", "lxml", "numpy", "pandas", "requests", "tqdm"],
     include_package_data=True,
     zip_safe=False,
 )
