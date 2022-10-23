@@ -23,7 +23,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
 
-    url="https://github.com/stammler/arxivloader",
+    url="https://github.com/stammler/arxivloader/",
     project_urls={"Source Code": "https://github.com/stammler/arxivloader/",
                   },
 
