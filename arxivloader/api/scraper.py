@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
 import requests
+from time import sleep
 
 
 def get_arxiv_page(query: str,
@@ -9,7 +10,8 @@ def get_arxiv_page(query: str,
                    max_results: int = 10,
                    sortBy: str = "relevance",
                    sortOrder: str = "descending",
-                   columns: list = []) -> list:
+                   columns: list = [],
+                   timeout: float = 10.) -> list:
     """
     Function processes the query and returns a list of data rows.
 
@@ -29,6 +31,8 @@ def get_arxiv_page(query: str,
         Order of sorting
     columns : list, optional, default : []
         List of columns to be returned
+    timeout : float, optional, default : 10.
+        Timeout in seconds for HTTP requests
 
     Returns
     -------
@@ -67,11 +71,29 @@ def get_arxiv_page(query: str,
         sortBy,
         sortOrder
     )
-    response = requests.get(url)
 
-    # Read data and get entries
-    data = BeautifulSoup(response.text, "xml")
-    entries = data.find_all("entry")
+    # Retry on server errors or timeouts
+    retries = requests.adapters.Retry(total=5, backoff_factor=0.5,
+                                      status_forcelist=[429, 500, 502, 503, 504])
+    adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+
+    http = requests.Session()
+    http.mount("http://", adapter)
+
+    # The arXiv API can return an empty data set, even though there should be more pages.
+    # Since it does not return an error code, we try again after one second.
+    # Only after 5 tries with empty data sets, we assume that the query is done.
+    i = 0
+    while i < 5:
+        response = http.get(url, timeout=timeout)
+
+        # Read data and get entries
+        data = BeautifulSoup(response.text, "xml")
+        entries = data.find_all("entry")
+        if entries != []:
+            break
+        sleep(1.)
+        i += 1
 
     # Loop over entries and build rows of data frame
     rows = []

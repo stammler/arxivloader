@@ -13,7 +13,9 @@ def load(query: str,
          delay: float = 3.,
          sortBy: str = "relevance",
          sortOrder: str = "descending",
-         columns: list = ["id", "title", "summary", "authors", "primary_category", "categories", "comments", "updated", "published", "doi", "links"]) -> pd.DataFrame:
+         columns: list = ["id", "title", "summary", "authors", "primary_category",
+                          "categories", "comments", "updated", "published", "doi", "links"],
+         timeout: float = 10.) -> pd.DataFrame:
     """
     Function returns a Pandas DataFrame with arXiv data for the given query.
     Please see the arXiv API documentation to build a valid query:
@@ -42,6 +44,8 @@ def load(query: str,
         Order of sorting
     columns : list, optional, default : ["id", "title", "summary", "authors", "primary_category", "categories", "comments", "updated", "published", "doi", "links"]
         Data columns to be retrieved
+    timeout : float, optional, default : 10.
+        Timeout in seconds for HTTP requests
 
     Returns
     -------
@@ -72,16 +76,27 @@ def load(query: str,
 
     rows = []
     start_ids = np.arange(start, start+num, page_size)
-    for start_id in tqdm(start_ids, desc="Downloading pages"):
-        maxres = np.minimum(page_size, start+num-start_id)
-        r = get_arxiv_page(
-            query, start=start_id, max_results=maxres, sortBy=sortBy, sortOrder=sortOrder, columns=columns)
-        if r == []:
-            break
-        rows += r
-        if start_id != start_ids[-1]:
-            sleep(delay)
+    is_empty = False
+    with tqdm(start_ids, desc="Downloading pages") as iterator:
+        for start_id in iterator:
+            if not is_empty:
+                if start_id > start_ids[0]:
+                    sleep(delay)
+                maxres = np.minimum(page_size, start+num-start_id)
+                r = get_arxiv_page(
+                    query, start=start_id, max_results=maxres, sortBy=sortBy, sortOrder=sortOrder, columns=columns, timeout=timeout)
+                if r == []:
+                    is_empty = True
+                    continue
+                rows += r
 
     df = pd.DataFrame(rows, columns=columns)
+
+    # Dropping duplicate rows
+    df.drop_duplicates(inplace=True, ignore_index=True)
+
+    # Printing success message
+    msg = "Retrieved {N_rows} entries.".format(N_rows=len(df))
+    print(msg)
 
     return df
