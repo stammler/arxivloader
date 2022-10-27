@@ -2,7 +2,7 @@ from arxivloader.api import get_arxiv_page
 import numpy as np
 import pandas as pd
 from time import sleep
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import warnings
 
 
