@@ -92,7 +92,7 @@ def get_arxiv_page(query: str,
         entries = data.find_all("entry")
         if entries != []:
             break
-        sleep(1.)
+        sleep(0.5*2**i)
         i += 1
 
     # Loop over entries and build rows of data frame

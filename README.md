@@ -3,7 +3,7 @@
 [![GitHub](https://img.shields.io/github/license/stammler/arxivloader) ](https://github.com/stammler/arxivloader/blob/master/LICENSE) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://github.com/stammler/arxivloader/blob/master/.github/CODE_OF_CONDUCT.md)  
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/arxivloader?label=PyPI%20downloads)](https://pypistats.org/packages/arxivloader)
 
-This tool is a wrapper of the [arXiv API](https://arxiv.org/help/api/) that allows you to retrieve metadata of articles published on arXiv.  
+This tool is a wrapper of the [arXiv API](https://arxiv.org/help/api/) that allows you to retrieve metadata of articles published on arXiv as `pandas.DataFrame`.  
 Please abide by the [Terms of Usage](https://arxiv.org/help/api/tou) of the arXiv API.
 
 ## Installation
@@ -117,6 +117,25 @@ print(df.head(5))
 |  2 | 2210.11207v1 | $\texttt{KOBEsim}$: a Bayesian observing strategy algorithm for planet detection in radial velocity blind-search | astro-ph.EP        | astro-ph.EP; astro-ph.IM   | 2022-10-20 12:33:03 |
 |  3 | 2210.11103v1 | Lower-than-expected flare temperatures for TRAPPIST-1                  | astro-ph.SR        | astro-ph.SR; astro-ph.EP   | 2022-10-20 08:55:47 |
 |  4 | 2210.10909v1 | TOI-3884 b: A rare 6-R$_{\oplus}$ planet that transits a low-mass star with a giant and likely polar spot | astro-ph.EP        | astro-ph.EP                | 2022-10-19 22:19:15 |
+
+## Options
+
+`arxivloader.load()` has several keyword arguments:
+
+| Keyword     | Default value  | Description                                                                 |
+|:------------|:---------------|:----------------------------------------------------------------------------|
+| `num`       | 10             | Maximum total number of entries to be retrieved.                            |
+| `start`     | 0              | Starting index of query.                                                    |
+| `page_size` | 10             | The entries are retrieved in pages. The maximum allowed page size is 30000. |
+| `delay`     | 3.             | Delay in seconds between page requests.                                     |
+| `sortBy`    | `"relevance"`  | Possible values: `"relevance"`, `"lastUpdatedDate"`, `"submittedDate"`.     |
+| `sortOrder` | `"descending"` | Possible values: `"descending"`, `"ascending"`.                             |
+| `columns`   | `["id", "title", "summary", "authors", "primary_category", "categories", "comments", "updated", "published", "doi", "links"]`  | List of the columns the `pandas.DataFrame` should contain.                          |
+| `timeout`   | 10.            | Timeout in seconds for a single page.                                       |
+
+The default options are usually good enough.  
+The `delay` has to be at least three seconds to be fair with the load on the arXiv API.  
+It can happen that the arxiv API does not respond for a query. `timeout` will set the time after which `arxivloader` assumes a failed attempt and will retry at most five times. Please note, that `timeout` needs to be larger than the arXiv API takes to process the query, which depends on `page_size`. Consider two minutes for ten thousand entries in a page.
 
 ## Acknowledgements
 
