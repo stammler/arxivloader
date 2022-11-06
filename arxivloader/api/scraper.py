@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
 import requests
-from time import sleep
 
 
 def get_arxiv_page(query: str,
@@ -79,21 +78,11 @@ def get_arxiv_page(query: str,
 
     http = requests.Session()
     http.mount("http://", adapter)
+    response = http.get(url, timeout=timeout)
 
-    # The arXiv API can return an empty data set, even though there should be more pages.
-    # Since it does not return an error code, we try again after one second.
-    # Only after 5 tries with empty data sets, we assume that the query is done.
-    i = 0
-    while i < 5:
-        response = http.get(url, timeout=timeout)
-
-        # Read data and get entries
-        data = BeautifulSoup(response.text, "xml")
-        entries = data.find_all("entry")
-        if entries != []:
-            break
-        sleep(0.5*2**i)
-        i += 1
+    # Read data and get entries
+    data = BeautifulSoup(response.text, "xml")
+    entries = data.find_all("entry")
 
     # Loop over entries and build rows of data frame
     rows = []
