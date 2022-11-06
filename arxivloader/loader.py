@@ -15,7 +15,8 @@ def load(query: str,
          sortOrder: str = "descending",
          columns: list = ["id", "title", "summary", "authors", "primary_category",
                           "categories", "comments", "updated", "published", "doi", "links"],
-         timeout: float = 10.) -> pd.DataFrame:
+         timeout: float = 10.,
+         verbosity: int = 2) -> pd.DataFrame:
     """
     Function returns a Pandas DataFrame with arXiv data for the given query.
     Please see the arXiv API documentation to build a valid query:
@@ -46,6 +47,8 @@ def load(query: str,
         Data columns to be retrieved
     timeout : float, optional, default : 10.
         Timeout in seconds for HTTP requests
+    verbosity : int, optional, default : 2
+        Level of verbosity
 
     Returns
     -------
@@ -72,22 +75,29 @@ def load(query: str,
         raise ValueError(
             "Keyword argument sortOrder can only be 'ascending' or 'descending'.")
 
+    hide_progress = False
+    # Set verbosity of progressbar
+    if(verbosity < 2):
+        hide_progress = True
+
     start_ids = np.arange(start, start+num, page_size)
 
     rows = []
     start_ids = np.arange(start, start+num, page_size)
-    is_empty = False
-    with tqdm(start_ids, desc="Downloading pages") as iterator:
+    is_done = False
+    with tqdm(start_ids, desc="Downloading pages", disable=hide_progress) as iterator:
         for start_id in iterator:
-            if not is_empty:
+            if not is_done:
                 if start_id > start_ids[0]:
                     sleep(delay)
                 maxres = np.minimum(page_size, start+num-start_id)
                 r = get_arxiv_page(
                     query, start=start_id, max_results=maxres, sortBy=sortBy, sortOrder=sortOrder, columns=columns, timeout=timeout)
                 if r == []:
-                    is_empty = True
+                    is_done = True
                     continue
+                if len(r) != maxres:
+                    is_done = True
                 rows += r
 
     df = pd.DataFrame(rows, columns=columns)
@@ -96,7 +106,8 @@ def load(query: str,
     df.drop_duplicates(inplace=True, ignore_index=True)
 
     # Printing success message
-    msg = "Retrieved {N_rows} entries.".format(N_rows=len(df))
-    print(msg)
+    if(verbosity > 0):
+        msg = "Retrieved {N_rows} entries.".format(N_rows=len(df))
+        print(msg)
 
     return df
