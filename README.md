@@ -38,7 +38,7 @@ import arxivloader
 
 keyword = "DustPy"
 prefix = "all"
-query = "search_query={prefix}:{keyword}".format(prefix, keyword)
+query = "search_query={pf}:{kw}".format(pf=prefix, kw=keyword)
 columns = ["id", "title", "authors"]
 
 df = arxivloader.load(query, columns=columns)
@@ -93,6 +93,29 @@ print(df)
 |---:|:-------------|:--------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------|
 |  0 | 1909.04674v1 | The DSHARP Rings: Evidence of Ongoing Planetesimal Formation? | Sebastian M. Stammler; Joanna Drazkowska; Til Birnstiel; Hubert Klahr; Cornelis P. Dullemond; Sean M. Andrews |
 
+### Searching by date
+
+It is possible to only retrieve entries in a specified date window.  
+This query selects all publications that have been submitted to `astro-ph.EP` on July 1st 2022 between 8am and 1pm.
+
+```
+import arxivloader
+
+prefix = "cat"
+cat = "astro-ph.EP"
+submittedDate = "[20220701080000+TO+20220701130000]"
+query = "search_query={pf}:{cat}+AND+submittedDate:{sd}".format(pf=prefix, cat=cat, sd=submittedDate)
+columns = ["id", "title", "authors", "published"]
+
+df = arxivloader.load(query, columns=columns, sortBy="submittedDate", sortOrder="ascending")
+print(df)
+```
+
+|    | id           | title                                                               | authors                                                               | published           |
+|---:|:-------------|:--------------------------------------------------------------------|:----------------------------------------------------------------------|:--------------------|
+|  0 | 2207.00273v1 | Whistler Waves As a Signature of Converging Magnetic Holes in Space Plasmas | Wence Jiang; Daniel Verscharen; Hui Li; Chi Wang; Kristopher G. Klein | 2022-07-01 08:55:54 |
+|  1 | 2207.00322v2 | DustPy: A Python Package for Dust Evolution in Protoplanetary Disks | Sebastian Markus Stammler; Tilman Birnstiel                           | 2022-07-01 10:25:59 |
+
 ### Searching by category
 
 It is possible to search large number of articles by category. Please be responsible with the traffic this query causes.
@@ -132,10 +155,12 @@ print(df.head(5))
 | `sortOrder` | `"descending"` | Possible values: `"descending"`, `"ascending"`.                             |
 | `columns`   | `["id", "title", "summary", "authors", "primary_category", "categories", "comments", "updated", "published", "doi", "links"]`  | List of the columns the `pandas.DataFrame` should contain.                          |
 | `timeout`   | 10.            | Timeout in seconds for a single page.                                       |
+| `verbosity` | 2              | Level of verbosity.                                                         |
 
 The default options are usually good enough.  
 The `delay` has to be at least three seconds to be fair with the load on the arXiv API.  
-It can happen that the arxiv API does not respond for a query. `timeout` will set the time after which `arxivloader` assumes a failed attempt and will retry at most five times. Please note, that `timeout` needs to be larger than the arXiv API takes to process the query, which depends on `page_size`. Consider two minutes for ten thousand entries in a page.
+It can happen that the arxiv API does not respond for a query. `timeout` will set the time after which `arxivloader` assumes a failed attempt and will retry at most five times. Please note, that `timeout` needs to be larger than the arXiv API takes to process the query, which depends on `page_size`. Consider two minutes for ten thousand entries in a page.  
+If `verbosity` is `0`, `arxivloader` will not display anything on screen. If `verbosity` is `1`, `arxivloader` will print out the number of retrieved entries at the end of execution. If `verbosity` is `2`, `arxivloader` will additionally show a progess bar.
 
 ## Acknowledgements
 
