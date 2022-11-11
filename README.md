@@ -14,6 +14,15 @@ Please abide by the [Terms of Usage](https://arxiv.org/help/api/tou) of the arXi
 
 Please consult the [arXiv API documentation](https://arxiv.org/help/api/user-manual#_query_interface) for help in constructing a valid query string.
 
+### Table of Contents
+
+* [Searching by keyword](#searching-by-keyword)
+* [Searching by id](#searching-by-id)
+* [Filtering specific articles by keywords](#filtering-specific-articles-by-keywords)
+* [Searching by date](#searching-by-date)
+* [Searching by category](#searching-by-category)
+* [Options](#options)
+
 ### Searching by keyword
 
 To search for a keyword the query needs to start with `search_query=` followed by a prefix and the search word.  
@@ -141,7 +150,7 @@ print(df.head(5))
 |  3 | 2210.11103v1 | Lower-than-expected flare temperatures for TRAPPIST-1                  | astro-ph.SR        | astro-ph.SR; astro-ph.EP   | 2022-10-20 08:55:47 |
 |  4 | 2210.10909v1 | TOI-3884 b: A rare 6-R$_{\oplus}$ planet that transits a low-mass star with a giant and likely polar spot | astro-ph.EP        | astro-ph.EP                | 2022-10-19 22:19:15 |
 
-## Options
+### Options
 
 `arxivloader.load()` has several keyword arguments:
 
