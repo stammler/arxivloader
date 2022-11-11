@@ -76,7 +76,7 @@ def load(query: str,
 
     if sortBy not in ["relevance", "lastUpdatedDate", "submittedDate"]:
         raise ValueError(
-            "Keyword argument sortBy can only be 'relevance', 'lastUpdatedDate', or 'submitedDate'.")
+            "Keyword argument sortBy can only be 'relevance', 'lastUpdatedDate', or 'submittedDate'.")
 
     if sortOrder not in ["ascending", "descending"]:
         raise ValueError(
