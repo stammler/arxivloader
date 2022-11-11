@@ -147,9 +147,9 @@ print(df.head(5))
 
 | Keyword     | Default value  | Description                                                                 |
 |:------------|:---------------|:----------------------------------------------------------------------------|
-| `num`       | 10             | Maximum total number of entries to be retrieved.                            |
+| `num`       | 10             | Maximum total number of entries to be retrieved. The maximum is `50000`.    |
 | `start`     | 0              | Starting index of query.                                                    |
-| `page_size` | 10             | The entries are retrieved in pages. The maximum allowed page size is 30000. |
+| `page_size` | 10             | The entries are retrieved in pages. The maximum allowed page size is `10000`. |
 | `delay`     | 3.             | Delay in seconds between page requests.                                     |
 | `sortBy`    | `"relevance"`  | Possible values: `"relevance"`, `"lastUpdatedDate"`, `"submittedDate"`.     |
 | `sortOrder` | `"descending"` | Possible values: `"descending"`, `"ascending"`.                             |
@@ -158,9 +158,10 @@ print(df.head(5))
 | `verbosity` | 2              | Level of verbosity.                                                         |
 
 The default options are usually good enough.  
+Per arXiv API the maximum allowed `N` is `50000` and the maximum allowed `page_size` is `10000`. Queries outside the scope will return empty results. Please refine your query accordingly.  
 The `delay` has to be at least three seconds to be fair with the load on the arXiv API.  
-It can happen that the arxiv API does not respond for a query. `timeout` will set the time after which `arxivloader` assumes a failed attempt and will retry at most five times. Please note, that `timeout` needs to be larger than the arXiv API takes to process the query, which depends on `page_size`. Consider two minutes for ten thousand entries in a page.  
-If `verbosity` is `0`, `arxivloader` will not display anything on screen. If `verbosity` is `1`, `arxivloader` will print out the number of retrieved entries at the end of execution. If `verbosity` is `2`, `arxivloader` will additionally show a progess bar.
+It can happen that the arXiv API does not respond for a query. `timeout` will set the time after which `arxivloader` assumes a failed attempt and will retry at most five times. Please note, that `timeout` needs to be larger than the arXiv API takes to process the query, which depends on `page_size`. Consider two minutes for ten thousand entries in a page.  
+If `verbosity` is `0`, `arxivloader` will not display anything on screen. If `verbosity` is `1`, `arxivloader` will print out the number of retrieved entries at the end of execution. If `verbosity` is `2`, `arxivloader` will additionally show a progress bar.
 
 ## Acknowledgements
 

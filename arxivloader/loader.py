@@ -63,9 +63,16 @@ def load(query: str,
         warnings.warn("Delay has to be at least 3 seconds. Setting delay=3.")
         delay = 3.
 
-    if page_size > 30_000:
-        warnings.warn("Maximum page size is 30000. Setting page_size=30000.")
-        page_size = 30_000
+    if num >= 50000:
+        warnings.warn("The arXiv API will at most return num = 50000 results.")
+
+    if start >= 50000:
+        warnings.warn(
+            "The maximum number of results per query is 50000. The arXiv API will return empty results. Please refine your query.")
+
+    if page_size > 10_000:
+        warnings.warn("Maximum page size is 10000. Setting page_size=10000.")
+        page_size = 10_000
 
     if sortBy not in ["relevance", "lastUpdatedDate", "submittedDate"]:
         raise ValueError(
